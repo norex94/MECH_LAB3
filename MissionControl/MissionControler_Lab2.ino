@@ -313,6 +313,8 @@ void printLCD() {
 	lcd.print(tmp);
 
 }
+//ginnn
+
 
 void setTimeKeeper(uint32_t wait) {
 	setTime = millis() + wait;
