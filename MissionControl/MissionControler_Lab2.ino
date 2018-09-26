@@ -4,16 +4,6 @@
 #include <SPI.h>
 #include <RH_RF95.h>
 
-
-// include the library code:
-#include <LiquidCrystal.h>
-
-// initialize the library by associating any needed LCD interface pin
-// with the arduino pin number it is connected to
-//(12, 13, 18, 17, 16, 15);
-const int rs = 12, en = 13, d4 = 18, d5 = 17, d6 = 16, d7 = 15;
-LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
-
 // Change to 434.0 or other frequency, must match RX's freq!
 #define RF95_FREQ 430.0
 #define RFM95_CS		5
