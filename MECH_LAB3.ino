@@ -1,62 +1,25 @@
-/*
-  SD card datalogger
-
- This example shows how to log data from three analog sensors
- to an SD card using the SD library.
-
- The circuit:
- * analog sensors on analog ins 0, 1, and 2
- * SD card attached to SPI bus as follows:
- ** MOSI - pin 11, pin 7 on Teensy with audio board
- ** MISO - pin 12
- ** CLK - pin 13, pin 14 on Teensy with audio board
- ** CS - pin 4,  pin 10 on Teensy with audio board
-
- created  24 Nov 2010
- modified 9 Apr 2012
- by Tom Igoe
-
- This example code is in the public domain.
-
- */
-
+//LAB3
 #include <Wire.h>
 #include <Adafruit_MPL3115A2.h>
-
+#include <SD.h>
+#include <SPI.h>
+#include "TinyGPS++.h"
 
 
 Adafruit_MPL3115A2 baro = Adafruit_MPL3115A2();
 
-#include "TinyGPS++.h"
+
 TinyGPSPlus gps;
 
 
-
-
-#include <SD.h>
-#include <SPI.h>
-
- // On the Ethernet Shield, CS is pin 4. Note that even if it's not
- // used as the CS pin, the hardware CS pin (10 on most Arduino boards,
- // 53 on the Mega) must be left as an output or the SD library
- // functions will not work.
-
  // change this to match your SD shield or module;
- // Arduino Ethernet shield: pin 4
- // Adafruit SD shields and modules: pin 10
- // Sparkfun SD shield: pin 8
- // Teensy audio board: pin 10
  // Teensy 3.5 & 3.6 on-board: BUILTIN_SDCARD
- // Wiz820+SD board: pin 4
- // Teensy 2.0: pin 0
- // Teensy++ 2.0: pin 20
+
 const int chipSelect = BUILTIN_SDCARD;
 
 void setup()
 {
-	//UNCOMMENT THESE TWO LINES FOR TEENSY AUDIO BOARD:
-	//SPI.setMOSI(7);  // Audio shield has MOSI on pin 7
-	//SPI.setSCK(14);  // Audio shield has SCK on pin 14
+
 	Wire.setSDA(PIN_A19);
 	Wire.setSCL(PIN_A18);
 
@@ -69,6 +32,7 @@ void setup()
 	while (!Serial) {
 		; // wait for serial port to connect. Needed for Leonardo only
 	}
+	//GPS Serial
 	Serial5.begin(9600);
 
 	Serial.print("Initializing SD card...");
@@ -81,8 +45,9 @@ void setup()
 	}
 	Serial.println("card initialized.");
 
+	//Chekka hvort hæðarnemi sé tengdur
 	while (!baro.begin()) {
-		Serial.println("Couldnt find sensor");
+		Serial.println("Couldnt find Altidude sensor...");
 		delay(100);
 	}
 
