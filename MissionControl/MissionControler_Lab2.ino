@@ -5,16 +5,12 @@
 #include <RH_RF95.h>
 
 // Change to 434.0 or other frequency, must match RX's freq!
-#define RF95_FREQ 430.0
+#define RF95_FREQ		430.0
 #define RFM95_CS		5
 #define RFM95_RST		6
 #define RFM95_INT		10
 
-#define ERRORLED			1
-
-
-
-
+#define ERRORLED		1
 
 //Mission Control caller ID
 const uint8_t MC_ID = 9;
@@ -22,9 +18,9 @@ const uint8_t MC_ID = 9;
 //Flight Computer caller ID
 const uint8_t FC_ID = 8;
 
-//two types of commands: set state & set throttle
-uint8_t CMD_SET_STATE = 0x01; // B 0000 0001;
-uint8_t CMD_SET_THROTTLE = 0x02; // B 0000 0010;
+//two types of commands: start datalog, send temperature
+uint8_t START_DATALOG = 0x01; // B 0000 0001
+uint8_t SEND_TEMP = 0x02; // B 0000 0010
 
 //the command I will be sending: nr.1-command type, nr.2-value and nr.3-error check.
 const int COMMAND_size = 3;
@@ -35,8 +31,11 @@ uint8_t CMD_CHECK;
 
 //the data I will be recieving from the Flight Computer
 uint8_t DATA_TYPE;
-uint8_t DATA_VALUE;
+uint32_t DATA_VALUE;
 uint8_t DATA_ERROR;
+
+//Battery
+uint8_t BATTERY;
 
 // Singleton instance of the radio driver
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
@@ -53,7 +52,6 @@ void setup()
 	digitalWrite(RFM95_RST, HIGH);
 	pinMode(ERRORLED, OUTPUT);
 	digitalWrite(ERRORLED, LOW);
-	pinMode(PIN_THROTTLE, INPUT);
 	pinMode(20, INPUT);	
 
 	Serial.println("Initializing");
@@ -78,31 +76,26 @@ void setup()
 	Serial.print("Frequency set to: "); Serial.println(RF95_FREQ);
 
 	rf95.setTxPower(23, false);
-
-	//testRun();
-	lcd.begin(16, 2);
-	delay(10);
-	lcd.print("This is working");
 }
 
-void sendCOMMAND(uint8_t CMD_TYPE, uint8_t CMD_VALUE)
+void sendCMD(uint8_t CMD_TYPE, uint8_t CMD_VALUE)
 {
 	//check is the XOR of TYPE and VALUE
-	CMD_CHECK = CMD_TYPE ^ CMD_VALUE;
+	CMD_CHECK = CMD_VALUE ^ CMD_TYPE;
 	COMMAND[0] = CMD_TYPE;
 	COMMAND[1] = CMD_VALUE;
 	COMMAND[2] = CMD_CHECK;
-	
-	rf95.setHeaderId(MC_ID);
+	digitalWrite(ERRORLED, LOW);
+	rf95.setHeaderId(FC_ID);
 	//Serial.print("Transmitting on: ");
-	//Serial.println(MC_ID);
+	//Serial.println(FC_ID);
 	rf95.send((uint8_t *)COMMAND, COMMAND_size);
 	delay(10);
 	rf95.waitPacketSent();
-	Serial.print("Command Sent: ");
-	Serial.print(CMD_TYPE, HEX);
-	//Serial.print(" Data: ");
-	//Serial.println(CMD_VALUE, DEC);
+	Serial.print("COMMAND sent: ");
+	Serial.println(CMD_TYPE, HEX);
+	Serial.print("Data: ");
+	Serial.println(CMD_VALUE, DEC);
 
 	recieveDATA();
 }
@@ -125,33 +118,12 @@ void recieveDATA()
 					DATA_VALUE = buf[1];
 					DATA_ERROR = buf[2];
 
-					switch (DATA_TYPE)
-					{
-					case 0x01:
-						Serial.print("#ACK COMMAND: ");
-						Serial.println(buf[1]);
-						digitalWrite(ERRORLED, LOW);
-						break;
-						
-					case 0x02:
-						Serial.print("#BATT VOLTAGE: ");
-						BATTERY = buf[1];
-						Serial.println(buf[1]);
-						digitalWrite(ERRORLED, LOW);
-						break;
-					case 0x03:
-						Serial.println("#Command FAIL");
-						digitalWrite(ERRORLED, HIGH);
-						break;
-					default:
-						Serial.println("#FAILED");
-						digitalWrite(ERRORLED, HIGH);
-						break;
-					}
+					Serial.print("Temperature: ");
+					Serial.println(DATA_VALUE);
 				}
 				else
 				{
-					Serial.println("CheackSum ERROR");
+					Serial.println("CheckSum ERROR");
 					digitalWrite(ERRORLED, HIGH);
 
 				}
@@ -182,12 +154,7 @@ void recieveDATA()
 
 void loop()
 {
-	printLCD();
-
-	currentState();
-	
-	Serial.println("Current stage:" + (String)CurrentStateNow);
-
-	Serial.println("____________________");
+	recieveDATA();
+	Serial.println("");
 	delay(100);
 }
