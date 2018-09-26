@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include "TinyGPS++.h"
 
+
 //Fyrir hæðarnema
 Adafruit_MPL3115A2 baro = Adafruit_MPL3115A2();
 
@@ -128,7 +129,7 @@ void loop()
 
 	Serial.print(" #LAT=");  Serial.print(gps.location.lat(), 6);
 	Serial.print(" #LONG="); Serial.print(gps.location.lng(), 6);
-	//Serial.print(" #ALT=");  Serial.println(gps.altitude.meters());
+	Serial.print(" #ALT=");  Serial.println(gps.altitude.meters());
 
 	digitalWrite(PIN_A17, HIGH);
 
