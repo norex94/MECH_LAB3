@@ -33,36 +33,13 @@ const uint8_t MC_ID = 9;
 //Flight Computer caller ID
 const uint8_t FC_ID = 8;
 
-//two types of commands: set state & set throttle
-uint8_t CMD_SET_STATE = 0x01; // B 0000 0001;
-uint8_t CMD_SET_THROTTLE = 0x02; // B 0000 0010;
+//Data I will be sending to Mission Control
+uint8_t DATA_;
+uint8_t DATA_TEMP;
+uint8_t DATA_CHECK;
 
-
-//the command I will be sending: nr.1-command type, nr.2-value and nr.3-error check.
-const int COMMAND_size = 3;
-uint8_t COMMAND[COMMAND_size];
+//Commands I will be recieving from Mission Control
 uint8_t CMD_TYPE;
-uint8_t CMD_VALUE;
-uint8_t CMD_CHECK;
-
-//the data I will be recieving from the Flight Computer
-uint8_t DATA_TYPE;
-uint8_t DATA_VALUE;
-uint8_t DATA_ERROR;
-
-
-//Data
-uint8_t DATA_BATTERY;
-uint8_t DATA_THROTTLE;
-
-uint8_t Current_Stage = 0;
-
-bool KILL_SWITCH = false;
-bool FAIL_SAFE = false;
-
-enum STATE_NAMES { START, TEST, READY, IGNITION, ASCENT, COASTING, APOGEE, DESCENT, LAND, DISABLE, RESET, SELFDESTRUCT };
-
-
 
 // Singleton instance of the radio driver
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
@@ -120,105 +97,7 @@ void setup()
 	rf95.setTxPower(23, false);
 }
 
-uint32_t readBattery()
-{
-	//The entire voltage range is read with 32 bits and converted to 8 bits (1 byte) for transmission..
-	uint32_t temp_VALUE = map(analogRead(BATTERY), 0, 1023, 0, 33);
-	return temp_VALUE;
-
-}
-
-
-void setState(uint8_t state)
-{
-	switch (state)
-	{
-	case 0:
-		//CMD_VALUE = START;
-		//igitalWrite(ENGINE, LOW);
-		digitalWrite(PARACHUTE, LOW);
-		digitalWrite(ENGINE, LOW);
-		break;
-	case 1:
-		//CMD_VALUE = TEST;
-		//digitalWrite(ENGINE, LOW);
-		digitalWrite(PARACHUTE, HIGH);
-		analogWrite(FUELPUMP, 255);
-		delay(2000);
-		digitalWrite(ENGINE, HIGH);
-		analogWrite(FUELPUMP, 100);
-		delay(3000);
-		analogWrite(FUELPUMP, 0);
-		digitalWrite(ENGINE, LOW);
-		digitalWrite(PARACHUTE, LOW);
-		Serial.println("Test Done.");
-		break;
-	case 2:
-		//CMD_VALUE = READY;
-		//digitalWrite(ENGINE, LOW);
-		digitalWrite(PARACHUTE, LOW);
-		digitalWrite(ENGINE, LOW);
-		break;
-	case 3:
-		//CMD_VALUE = IGNITION;
-		//digitalWrite(ENGINE, LOW);
-		digitalWrite(PARACHUTE, LOW);
-		digitalWrite(ENGINE, HIGH);
-		break;
-	case 4:
-		//CMD_VALUE = ASCENT;
-		//digitalWrite(ENGINE, HIGH);
-		digitalWrite(PARACHUTE, LOW);
-		digitalWrite(ENGINE, HIGH);
-		break;
-	case 5:
-		//CMD_VALUE = COASTING;
-		//digitalWrite(ENGINE, LOW);
-		digitalWrite(PARACHUTE, LOW);
-		digitalWrite(ENGINE, LOW);
-		break;
-	case 6:
-		//CMD_VALUE = APOGEE;
-		//digitalWrite(ENGINE, LOW);
-		digitalWrite(PARACHUTE, HIGH);
-		digitalWrite(ENGINE, LOW);
-		break;
-	case 7:
-		//CMD_VALUE = DESCENT;
-		//digitalWrite(ENGINE, LOW);
-		digitalWrite(PARACHUTE, HIGH);
-		digitalWrite(ENGINE, LOW);
-		break;
-	case 8:
-		//CMD_VALUE = LAND;
-		//digitalWrite(ENGINE, LOW);
-		digitalWrite(PARACHUTE, LOW);
-		digitalWrite(ENGINE, LOW);
-		break;
-	case 9:
-		//CMD_VALUE = DISABLE;
-		//digitalWrite(ENGINE, LOW);
-		digitalWrite(PARACHUTE, LOW);
-		digitalWrite(ENGINE, LOW);
-		break;
-	case 10:
-		//CMD_VALUE = RESET;
-		//digitalWrite(ENGINE, LOW);
-		digitalWrite(PARACHUTE, LOW);
-		digitalWrite(ENGINE, LOW);
-		break;
-	case 11:
-		//CMD_VALUE = SELFDESTRUCT;
-		//digitalWrite(ENGINE, LOW);
-		digitalWrite(PARACHUTE, LOW);
-		digitalWrite(ENGINE, LOW);
-		break;
-	default:
-		break;
-	}
-}
-
-void sendBack(uint8_t CMD_TYPE, uint8_t CMD_VALUE)
+void sendBack(uint8_t CMD_VALUE)
 {
 	//check is the XOR of TYPE and VALUE
 	CMD_CHECK = CMD_VALUE ^ CMD_TYPE;
@@ -242,88 +121,55 @@ void recieveDATA()
 {
 	uint8_t buf[COMMAND_size];
 	uint8_t len = sizeof(buf);
-	
+
 	//Serial.println("Waiting for reply...");
 	//MAX wait for DATA is set 1 sec.
-	if (rf95.waitAvailableTimeout(1000))
+	if (rf95.waitAvailableTimeout(100))
 	{
 		if (rf95.recv(buf, &len))
 		{
-			if (rf95.headerId() == MC_ID) 
-			{
+			if (rf95.headerId() == FC_ID) {
 				if (buf[2] == (buf[0] ^ buf[1]))
 				{
 					DATA_TYPE = buf[0];
 					DATA_VALUE = buf[1];
 					DATA_ERROR = buf[2];
-					
-					
-					switch (DATA_TYPE)
-					{
-					case 0x01:
-						Serial.print("#Stage recived: ");
-						Serial.println(buf[1], HEX);
-						Current_Stage = buf[1];
-						setState(Current_Stage);
-						sendBack(REPLY_ACK, DATA_VALUE);
-						break;
-					case 0x02:
-						Serial.print("#Throttle recived: ");
-						Serial.println(buf[1], DEC);
-						DATA_THROTTLE = buf[1];
-						
-						sendBack(REPLY_BATT, DATA_BATTERY);
-						break;
 
-					default:
-						Serial.print("#Error on Stage: ");
-						Serial.println(DATA_TYPE, HEX);
-						sendBack(REPLY_ERROR, DATA_VALUE);
-						break;
-					}
-
-
-
+					Serial.print("Temperature: ");
+					Serial.println(DATA_VALUE);
 				}
 				else
 				{
-					Serial.println("CheackSum ERROR");
+					Serial.println("CheckSum ERROR");
 					digitalWrite(ERRORLED, HIGH);
 
 				}
+				//Serial.println((char*)buf);
+				//Serial.print("RSSI: ");
+				//Serial.println(rf95.lastRssi(), DEC);
 			}
-			else { 
-				Serial.println("Not my message, ID:"); 
+			else {
+				Serial.println("Not my message, ID:");
 				Serial.println(rf95.headerId());
 			}
-			//Serial.println((char*)buf);
-			//Serial.print("RSSI: ");
-			//Serial.println(rf95.lastRssi(), DEC);
+
 		}
 		else
 		{
 			Serial.println("Receive failed");
 			digitalWrite(ERRORLED, HIGH);							//DATA_TYPE: 1-data, 2-ack, 3-error
+
 		}
 	}
 	else
 	{
-		Serial.println("MC not sending..");
+		Serial.println("ACK not received");
 		digitalWrite(ERRORLED, HIGH);
 	}
 
 }
 
-
-
-
 void loop()
 {
-	//sound();
 
-	Serial.println("____________________");
-	DATA_BATTERY = readBattery();
-	recieveDATA();
-	analogWrite(FUELPUMP, map(DATA_THROTTLE, 0, 100, 0, 255));
-	//delay(50);
 }
