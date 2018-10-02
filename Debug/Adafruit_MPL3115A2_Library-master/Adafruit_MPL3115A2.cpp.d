@@ -1,5 +1,5 @@
-C:\Users\Arnor\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\Adafruit_MPL3115A2_Library-master\Adafruit_MPL3115A2.cpp.o: \
- C:\Users\Arnor\Documents\Arduino\libraries\Adafruit_MPL3115A2_Library-master\Adafruit_MPL3115A2.cpp \
+C:\Users\hjorv\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\Adafruit_MPL3115A2_Library-master\Adafruit_MPL3115A2.cpp.o: \
+ C:\Users\hjorv\OneDrive\Documents\Arduino\libraries\Adafruit_MPL3115A2_Library-master\Adafruit_MPL3115A2.cpp \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/Arduino.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/WProgram.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/avr/pgmspace.h \
@@ -39,4 +39,4 @@ C:\Users\Arnor\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\Adafruit_MPL311
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/IntervalTimer.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\Wire/Wire.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\Wire/WireKinetis.h \
- C:\Users\Arnor\Documents\Arduino\libraries\Adafruit_MPL3115A2_Library-master\Adafruit_MPL3115A2.h
+ C:\Users\hjorv\OneDrive\Documents\Arduino\libraries\Adafruit_MPL3115A2_Library-master\Adafruit_MPL3115A2.h
