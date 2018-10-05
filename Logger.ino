@@ -7,58 +7,48 @@
 #include <RH_RF95.h>
 #include <TeensyThreads.h>
 
-
-
-
+//GPS-#####################################################################
 // what's the name of the hardware serial port?
 #define GPSSerial Serial5
-
-//hitamaelir er a pinna 14 sem er A0!!!!!!!!!!!!!!
-
 // Connect to the GPS on the hardware port
 Adafruit_GPS GPS(&GPSSerial);
 
 // Set GPSECHO to 'false' to turn off echoing the GPS data to the Serial console
 // Set to 'true' if you want to debug and listen to the raw GPS sentences
 #define GPSECHO false
+//#####################################################################
 
 uint32_t timer = millis();
 
+//hitamaelir er a pinna 14 sem er A0!!!!!!!!!!!!!!
 
 //Fyrir hæðarnema
 Adafruit_MPL3115A2 baro = Adafruit_MPL3115A2();
-
-//fyrir radio
-RH_RF95 rf95(10.24);
-
- // change this to match your SD shield or module;
- // Teensy 3.5 & 3.6 on-board: BUILTIN_SDCARD
-const int chipSelect = BUILTIN_SDCARD;
 //BREYTURR----------------------------------------------
 float pascals;
 float altm;
 float tempC;
 
 
+//fyrir radio
+//RH_RF95 rf95(10.24);
+
+
+//fyrir SD kort
+// change this to match your SD shield or module;
+ // Teensy 3.5 & 3.6 on-board: BUILTIN_SDCARD
+const int chipSelect = BUILTIN_SDCARD;
+
+
 //---------------------------------------------
 
 void setup()
 {
-
-	//Wire1.begin();
+   Serial.begin(115200);
 	
-	
-
-
-
-   // Open serial communications and wait for port to open:
-	Serial.begin(115200);
-	
-
-
-
 	pinMode(PIN_A17, OUTPUT);
 
+	//SD KORT ___________________________________________________________
 	Serial.print("Initializing SD card...");
 
 	// see if the card is present and can be initialized:
@@ -68,16 +58,14 @@ void setup()
 		return;
 	}
 	Serial.println("card initialized.");
-
-
+	//HÆÐARNEMI ___________________________________________________________
 	//Chekka hvort hæðarnemi sé tengdur
 	while (!baro.begin()) {
 		Serial.println("Couldnt find Altidude sensor...");
 		delay(100);
-		
 	}
 
-
+	//GPS ___________________________________________________________
 	// 9600 NMEA is the default baud rate for Adafruit MTK GPS's- some use 4800
 	GPS.begin(9600);
 	// uncomment this line to turn on RMC (recommended minimum) and GGA (fix data) including altitude
@@ -101,127 +89,105 @@ void setup()
 
 	Serial.println("GPS DONE");
 
-
-	//radio
-	if (!rf95.init()) {
+	
+	//RADIO ___________________________________________________________
+	/*if (!rf95.init()) {
 		Serial.println("init failed");
 	}
 	else { Serial.println("RF95 Success"); }
-
+	*/
 
 	Serial.println("Done setup");
 	// Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
 
-	// The default transmitter power is 13dBm, using PA_BOOST.
-	// If you are using RFM95/96/97/98 modules which uses the PA_BOOST transmitter pin, then 
-	// you can set transmitter powers from 5 to 23 dBm:
-  //  driver.setTxPower(23, false);
-	// If you are using Modtronix inAir4 or inAir9,or any other module which uses the
-	// transmitter RFO pins and not the PA_BOOST pins
-	// then you can configure the power transmitter power for -1 to 14 dBm and with useRFO true. 
-	// Failure to do that will result in extremely low transmit powers.
-  //  driver.setTxPower(14, true);
+	threads.addThread(updateWheater);
+	Serial.println("Thread set");
 
-	//threads.addThread(updateWheater);
-	//Serial.println("Thread set");
+	digitalWrite(PIN_A17, HIGH);
 }
 
-
-
-
-
-
 void readGPS() {
-	Serial.println("----GPS UPDATE-----");
 	// read data from the GPS in the 'main loop'
-	char c = GPS.read();
-
+	GPS.read();
 	// if you want to debug, this is a good time to do it!
-	if (GPSECHO)
-		if (c) Serial.print(c);
+	//if (GPSECHO)
+	//	if (c) Serial.print(c);
 	// if a sentence is received, we can check the checksum, parse it...
 	if (GPS.newNMEAreceived()) {
 		// a tricky thing here is if we print the NMEA sentence, or data
 		// we end up not listening and catching other sentences!
 		// so be very wary if using OUTPUT_ALLDATA and trytng to print out data
-		Serial.println(GPS.lastNMEA()); // this also sets the newNMEAreceived() flag to false
+		//Serial.println(GPS.lastNMEA()); // this also sets the newNMEAreceived() flag to false
 		if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
 			return; // we can fail to parse a sentence in which case we should just wait for another
 	}
-	// if millis() or timer wraps around, we'll just reset it
-	if (timer > millis()) timer = millis();
-
-	// approximately every 2 seconds or so, print out the current stats
-	if (millis() - timer > 2000) {
-		timer = millis(); // reset the timer
-		Serial.print("\nTime: ");
-		Serial.print(GPS.hour, DEC); Serial.print(':');
-		Serial.print(GPS.minute, DEC); Serial.print(':');
-		Serial.print(GPS.seconds, DEC); Serial.print('.');
-		Serial.println(GPS.milliseconds);
-		Serial.print("Date: ");
-		Serial.print(GPS.day, DEC); Serial.print('/');
-		Serial.print(GPS.month, DEC); Serial.print("/20");
-		Serial.println(GPS.year, DEC);
-		Serial.print("Fix: "); Serial.print((int)GPS.fix);
-		Serial.print(" quality: "); Serial.println((int)GPS.fixquality);
-		if (GPS.fix) {
-			Serial.print("Location: ");
-			Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);
-			Serial.print(", ");
-			Serial.print(GPS.longitude, 4); Serial.println(GPS.lon);
-			Serial.print("Speed (knots): "); Serial.println(GPS.speed);
-			Serial.print("Angle: "); Serial.println(GPS.angle);
-			Serial.print("Altitude: "); Serial.println(GPS.altitude);
-			Serial.print("Satellites: "); Serial.println((int)GPS.satellites);
-		}
-	}
-
+	
 }
 
-
+//Þetta fall er á þræði og er kallað sífelt á það. 
 void updateWheater() {
-	//Serial.println("----WHEATER UPDATE-----");
-	pascals = baro.getPressure();
-	Serial.print(pascals / 1000); Serial.print(" mBar#  ");
-
-	altm = baro.getAltitude();
-	Serial.print(altm); Serial.print(" meters#  ");
-
-	tempC = baro.getTemperature();
-	Serial.print(tempC); Serial.println("*C#");
-	Serial.println();
-		
-
 	
+	while(1){
+		//Serial.println("----WHEATER UPDATE-----");
+		pascals = baro.getPressure();
+		threads.delay(50);
+
+		altm = baro.getAltitude();
+		threads.delay(50);
+		
+		tempC = baro.getTemperature();
+		
+		threads.yield();
+	}
 }
 
-
-
-
-bool logData(const char *name) {
+bool logToSDCard(const char *name) {
 	
-	Serial.println("----LOG UPDATE-----");
+	//Serial.println("----LOG UPDATE-----");
 	// open the file. note that only one file can be open at a time,
 	// so you have to close this one before opening another.
 	File dataFile = SD.open(name, FILE_WRITE);
 	   
 	// if the file is available, write to it:
 	if (dataFile) {
-		dataFile.print("DATA;");
+
+		dataFile.print(GPS.day, DEC); dataFile.print('/');
+		dataFile.print(GPS.month, DEC); dataFile.print("/20");
+		dataFile.print(GPS.year, DEC);
+		dataFile.print(",");
+
+		dataFile.print(GPS.hour, DEC); dataFile.print(':');
+		dataFile.print(GPS.minute, DEC); dataFile.print(':');
+		dataFile.print(GPS.seconds, DEC);
+		dataFile.print(",");
+
+		dataFile.print(GPS.latitude, 4); dataFile.print(GPS.lat);
+		dataFile.print(",");
+		
+		dataFile.print(GPS.longitude, 4); dataFile.println(GPS.lon);
+		dataFile.print(",");
+
+		dataFile.print(GPS.altitude);
+		dataFile.print(",");
+
 		dataFile.print(tempC);
-		dataFile.print(";");
+		dataFile.print(",");
+		
 		dataFile.print(altm);
-		dataFile.print(";");
-		//dataFile.print(gps.location.lat(), 6);
-		dataFile.print(";");
-		//dataFile.print(gps.location.lng(), 6);
+		dataFile.print(",");
+
+		dataFile.print((int)GPS.fix);
+		dataFile.print(",");
+		
+		dataFile.print((int)GPS.fixquality);
+		dataFile.print(",");
+		
+		dataFile.print((int)GPS.satellites);
 		dataFile.println(";");
 
-		
 		dataFile.close();
 		// print to the serial port too:
-		Serial.println("-Log Done.");
+		Serial.println("#Log Done.");
 		return true;
 	}
 	// if the file isn't open, pop up an error:
@@ -235,26 +201,58 @@ bool logData(const char *name) {
 
 }
 
+void printToSerial() {
+	
+	Serial.print("Alt:"); Serial.print(altm); Serial.println(" meters");
+	Serial.print("Temp:"); Serial.print(tempC); Serial.println("*C");
+	Serial.print("Pressure:"); Serial.print(pascals / 1000); Serial.println(" mBar");
+
+	Serial.print("\nTime: ");
+	Serial.print(GPS.hour, DEC); Serial.print(':');
+	Serial.print(GPS.minute, DEC); Serial.print(':');
+	Serial.print(GPS.seconds, DEC); Serial.print('.');
+	Serial.println(GPS.milliseconds);
+	Serial.print("Date: ");
+	Serial.print(GPS.day, DEC); Serial.print('/');
+	Serial.print(GPS.month, DEC); Serial.print("/20");
+	Serial.println(GPS.year, DEC);
+	Serial.print("Fix: "); Serial.print((int)GPS.fix);
+	Serial.print(" quality: "); Serial.println((int)GPS.fixquality);
+	if (GPS.fix) {
+		Serial.print("Location: ");
+		Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);
+		Serial.print(", ");
+		Serial.print(GPS.longitude, 4); Serial.println(GPS.lon);
+		Serial.print("Speed (knots): "); Serial.println(GPS.speed);
+		Serial.print("Angle: "); Serial.println(GPS.angle);
+		Serial.print("Altitude: "); Serial.println(GPS.altitude);
+		Serial.print("Satellites: "); Serial.println((int)GPS.satellites);
+	}
+
+
+}
+
 void loop()
 {
+	
+	readGPS(); //GPS er ekki á þræði því það kom einvher bugg
+	// if millis() or timer wraps around, we'll just reset it
+	if (timer > millis()) timer = millis();
 
-	updateWheater();
+	// approximately every 2 seconds or so, print out the current stats
+	if (millis() - timer > 1000) {
+		timer = millis(); // reset the timer
+
+		printToSerial();
+		logToSDCard("GPS.txt");
 
 
-	logData("Loggari.txt");
+		Serial.println("_________________________________");
+
+	}
 
 	
 
-
-	digitalWrite(PIN_A17, HIGH);
-
-	
-	readGPS();
-
-
-	Serial.println("_________________________________");
-	
-	delay(1000);
 }
 
 

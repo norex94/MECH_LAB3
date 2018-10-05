@@ -44,27 +44,32 @@ void setup()
 	GPSSerial.println(PMTK_Q_RELEASE);
 }
 
-void loop() // run over and over again
-{
+void readGPS() {
 	// read data from the GPS in the 'main loop'
 	char c = GPS.read();
 	// if you want to debug, this is a good time to do it!
-	if (GPSECHO)
-		if (c) Serial.print(c);
+	//if (GPSECHO)
+	//	if (c) Serial.print(c);
 	// if a sentence is received, we can check the checksum, parse it...
 	if (GPS.newNMEAreceived()) {
 		// a tricky thing here is if we print the NMEA sentence, or data
 		// we end up not listening and catching other sentences!
 		// so be very wary if using OUTPUT_ALLDATA and trytng to print out data
-		Serial.println(GPS.lastNMEA()); // this also sets the newNMEAreceived() flag to false
+		//Serial.println(GPS.lastNMEA()); // this also sets the newNMEAreceived() flag to false
 		if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
 			return; // we can fail to parse a sentence in which case we should just wait for another
 	}
+}
+
+
+void loop() // run over and over again
+{
+	readGPS();
 	// if millis() or timer wraps around, we'll just reset it
 	if (timer > millis()) timer = millis();
 
 	// approximately every 2 seconds or so, print out the current stats
-	if (millis() - timer > 2000) {
+	if (millis() - timer > 1000) {
 		timer = millis(); // reset the timer
 		Serial.print("\nTime: ");
 		Serial.print(GPS.hour, DEC); Serial.print(':');

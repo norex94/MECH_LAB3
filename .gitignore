@@ -6,3 +6,13 @@
 __vm/Upload.vmps.xml
 __vm/Configuration.Debug.vmps.xml
 __vm/Compile.vmps.xml
+Debug/Logger.ino.hex
+Debug/Logger.ino.elf
+Debug/Logger.hex
+Debug/Logger.elf
+Debug/Logger.cpp.o
+Debug/board.buildinfo
+__vm/Upload.vmps.xml
+__vm/Configuration.Debug.vmps.xml
+__vm/Compile.vmps.xml
+.vs/MECH_LAB3_Allt/v15/.suo

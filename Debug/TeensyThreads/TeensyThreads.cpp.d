@@ -1,8 +1,6 @@
-C:\Users\Arnor\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\RadioHead\RH_NRF24.cpp.o: \
- C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead\RH_NRF24.cpp \
- C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RH_NRF24.h \
- C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RHGenericSPI.h \
- C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RadioHead.h \
+C:\Users\Arnor\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\TeensyThreads\TeensyThreads.cpp.o: \
+ C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\TeensyThreads\TeensyThreads.cpp \
+ C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\TeensyThreads\TeensyThreads.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/Arduino.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/WProgram.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/avr/pgmspace.h \
@@ -40,10 +38,4 @@ C:\Users\Arnor\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\RadioHead\RH_NR
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/elapsedMillis.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/Arduino.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/IntervalTimer.h \
- C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\SPI/SPI.h \
- C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/DMAChannel.h \
- C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/EventResponder.h \
- C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RHutil/atomic.h \
- C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RHNRFSPIDriver.h \
- C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RHGenericDriver.h \
- C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RHHardwareSPI.h
+ C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/IntervalTimer.h
