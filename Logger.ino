@@ -104,10 +104,9 @@ void setup()
 	//Serial.println("Thread set");
 }
 
-
 void readGPS() {
 	// read data from the GPS in the 'main loop'
-	char c = GPS.read();
+	GPS.read();
 	// if you want to debug, this is a good time to do it!
 	//if (GPSECHO)
 	//	if (c) Serial.print(c);
@@ -125,8 +124,8 @@ void readGPS() {
 
 void updateWheater() {
 	//Serial.println("----WHEATER UPDATE-----");
-	pascals = baro.getPressure();
-	Serial.print(pascals / 1000); Serial.print(" mBar#  ");
+	//pascals = baro.getPressure();
+	//Serial.print(pascals / 1000); Serial.print(" mBar#  ");
 
 	altm = baro.getAltitude();
 	Serial.print(altm); Serial.print(" meters#  ");
@@ -146,17 +145,41 @@ bool logToSDCard(const char *name) {
 	   
 	// if the file is available, write to it:
 	if (dataFile) {
-		dataFile.print("DATA;");
+
+		dataFile.print(GPS.day, DEC); dataFile.print('/');
+		dataFile.print(GPS.month, DEC); dataFile.print("/20");
+		dataFile.print(GPS.year, DEC);
+		dataFile.print(",");
+
+		dataFile.print(GPS.hour, DEC); dataFile.print(':');
+		dataFile.print(GPS.minute, DEC); dataFile.print(':');
+		dataFile.print(GPS.seconds, DEC);
+		dataFile.print(",");
+
+		dataFile.print(GPS.latitude, 4); dataFile.print(GPS.lat);
+		dataFile.print(",");
+		
+		dataFile.print(GPS.longitude, 4); dataFile.println(GPS.lon);
+		dataFile.print(",");
+
+		dataFile.print(GPS.altitude);
+		dataFile.print(",");
+
 		dataFile.print(tempC);
-		dataFile.print(";");
+		dataFile.print(",");
+		
 		dataFile.print(altm);
-		dataFile.print(";");
-		//dataFile.print(gps.location.lat(), 6);
-		dataFile.print(";");
-		//dataFile.print(gps.location.lng(), 6);
+		dataFile.print(",");
+
+		dataFile.print((int)GPS.fix);
+		dataFile.print(",");
+		
+		dataFile.print((int)GPS.fixquality);
+		dataFile.print(",");
+		
+		dataFile.print((int)GPS.satellites);
 		dataFile.println(";");
 
-		
 		dataFile.close();
 		// print to the serial port too:
 		Serial.println("#Log Done.");
@@ -210,8 +233,8 @@ void loop()
 	// approximately every 2 seconds or so, print out the current stats
 	if (millis() - timer > 1000) {
 		timer = millis(); // reset the timer
-		updateWheater();
-		logToSDCard("Loggari.txt");
+	//	updateWheater();
+		logToSDCard("GPS.txt");
 		printToSerial();
 		Serial.println("_________________________________");
 
