@@ -100,8 +100,10 @@ void setup()
 	Serial.println("Done setup");
 	// Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
 
-	//threads.addThread(updateWheater);
-	//Serial.println("Thread set");
+	threads.addThread(updateWheater);
+	Serial.println("Thread set");
+
+	digitalWrite(PIN_A17, HIGH);
 }
 
 void readGPS() {
@@ -119,21 +121,24 @@ void readGPS() {
 		if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
 			return; // we can fail to parse a sentence in which case we should just wait for another
 	}
-
+	
 }
 
 void updateWheater() {
-	//Serial.println("----WHEATER UPDATE-----");
-	//pascals = baro.getPressure();
-	//Serial.print(pascals / 1000); Serial.print(" mBar#  ");
-
-	altm = baro.getAltitude();
-	Serial.print(altm); Serial.print(" meters#  ");
-
-	tempC = baro.getTemperature();
-	Serial.print(tempC); Serial.println("*C#");
-	Serial.println();
 	
+	while(1){
+		//Serial.println("----WHEATER UPDATE-----");
+		pascals = baro.getPressure();
+		threads.delay(50);
+
+		altm = baro.getAltitude();
+		threads.delay(50);
+		
+		tempC = baro.getTemperature();
+		
+
+		threads.yield();
+	}
 }
 
 bool logToSDCard(const char *name) {
@@ -225,7 +230,7 @@ void printToSerial() {
 
 void loop()
 {
-
+	
 	readGPS();
 	// if millis() or timer wraps around, we'll just reset it
 	if (timer > millis()) timer = millis();
@@ -233,20 +238,21 @@ void loop()
 	// approximately every 2 seconds or so, print out the current stats
 	if (millis() - timer > 1000) {
 		timer = millis(); // reset the timer
-	//	updateWheater();
+		Serial.print(altm); Serial.print(" meters#  ");
+		Serial.print(tempC); Serial.println("*C#");
+		Serial.print(pascals / 1000); Serial.print(" mBar#  ");
+		Serial.println();
+
+		
+//		updateWheater();
 		logToSDCard("GPS.txt");
 		printToSerial();
+
+
+
 		Serial.println("_________________________________");
 
 	}
-
-
-
-	digitalWrite(PIN_A17, HIGH);
-
-	
-	
-
 
 	
 
