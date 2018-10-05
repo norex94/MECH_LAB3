@@ -5,7 +5,7 @@
 #include <SPI.h>
 #include <Adafruit_GPS.h>
 #include <RH_RF95.h>
-
+#include <TeensyThreads.h>
 
 
 
@@ -47,6 +47,9 @@ void setup()
 
 	//Wire1.begin();
 	
+	
+
+
 
    // Open serial communications and wait for port to open:
 	Serial.begin(115200);
@@ -100,8 +103,13 @@ void setup()
 
 
 	//radio
-	if (!rf95.init())
+	if (!rf95.init()) {
 		Serial.println("init failed");
+	}
+	else { Serial.println("RF95 Success"); }
+
+
+	Serial.println("Done setup");
 	// Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
 
 	// The default transmitter power is 13dBm, using PA_BOOST.
@@ -113,10 +121,13 @@ void setup()
 	// then you can configure the power transmitter power for -1 to 14 dBm and with useRFO true. 
 	// Failure to do that will result in extremely low transmit powers.
   //  driver.setTxPower(14, true);
+
+	//threads.addThread(updateWheater);
+	//Serial.println("Thread set");
 }
 
 
-}
+
 
 
 
@@ -124,6 +135,7 @@ void readGPS() {
 	Serial.println("----GPS UPDATE-----");
 	// read data from the GPS in the 'main loop'
 	char c = GPS.read();
+
 	// if you want to debug, this is a good time to do it!
 	if (GPSECHO)
 		if (c) Serial.print(c);
@@ -169,7 +181,7 @@ void readGPS() {
 
 
 void updateWheater() {
-	Serial.println("----WHEATER UPDATE-----");
+	//Serial.println("----WHEATER UPDATE-----");
 	pascals = baro.getPressure();
 	Serial.print(pascals / 1000); Serial.print(" mBar#  ");
 
@@ -179,8 +191,10 @@ void updateWheater() {
 	tempC = baro.getTemperature();
 	Serial.print(tempC); Serial.println("*C#");
 	Serial.println();
-}
+		
 
+	
+}
 
 
 
@@ -229,13 +243,18 @@ void loop()
 
 	logData("Loggari.txt");
 
+	
+
 
 	digitalWrite(PIN_A17, HIGH);
 
 	
 	readGPS();
 
+
 	Serial.println("_________________________________");
+	
+	delay(1000);
 }
 
 
