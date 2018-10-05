@@ -45,17 +45,6 @@ void setup()
 }
 
 void readGPS() {
-
-
-
-
-
-
-}
-
-
-void loop() // run over and over again
-{
 	// read data from the GPS in the 'main loop'
 	char c = GPS.read();
 	// if you want to debug, this is a good time to do it!
@@ -70,6 +59,12 @@ void loop() // run over and over again
 		if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
 			return; // we can fail to parse a sentence in which case we should just wait for another
 	}
+}
+
+
+void loop() // run over and over again
+{
+	readGPS();
 	// if millis() or timer wraps around, we'll just reset it
 	if (timer > millis()) timer = millis();
 
