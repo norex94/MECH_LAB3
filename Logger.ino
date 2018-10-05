@@ -31,7 +31,7 @@ float tempC;
 
 
 //fyrir radio
-RH_RF95 rf95(10.24);
+//RH_RF95 rf95(10.24);
 
 
 //fyrir SD kort
@@ -91,11 +91,11 @@ void setup()
 
 	
 	//RADIO ___________________________________________________________
-	if (!rf95.init()) {
+	/*if (!rf95.init()) {
 		Serial.println("init failed");
 	}
 	else { Serial.println("RF95 Success"); }
-
+	*/
 
 	Serial.println("Done setup");
 	// Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
@@ -106,7 +106,20 @@ void setup()
 
 
 void readGPS() {
-
+	// read data from the GPS in the 'main loop'
+	char c = GPS.read();
+	// if you want to debug, this is a good time to do it!
+	//if (GPSECHO)
+	//	if (c) Serial.print(c);
+	// if a sentence is received, we can check the checksum, parse it...
+	if (GPS.newNMEAreceived()) {
+		// a tricky thing here is if we print the NMEA sentence, or data
+		// we end up not listening and catching other sentences!
+		// so be very wary if using OUTPUT_ALLDATA and trytng to print out data
+		//Serial.println(GPS.lastNMEA()); // this also sets the newNMEAreceived() flag to false
+		if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
+			return; // we can fail to parse a sentence in which case we should just wait for another
+	}
 
 }
 
@@ -126,7 +139,7 @@ void updateWheater() {
 
 bool logToSDCard(const char *name) {
 	
-	Serial.println("----LOG UPDATE-----");
+	//Serial.println("----LOG UPDATE-----");
 	// open the file. note that only one file can be open at a time,
 	// so you have to close this one before opening another.
 	File dataFile = SD.open(name, FILE_WRITE);
@@ -146,7 +159,7 @@ bool logToSDCard(const char *name) {
 		
 		dataFile.close();
 		// print to the serial port too:
-		Serial.println("-Log Done.");
+		Serial.println("#Log Done.");
 		return true;
 	}
 	// if the file isn't open, pop up an error:

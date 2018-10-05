@@ -1,4 +1,4 @@
-C:\Users\hjorv\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\SD\utility\SdFile.cpp.o: \
+C:\Users\Arnor\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\SD\utility\SdFile.cpp.o: \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\SD\utility\SdFile.cpp \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\SD\utility/SdFat.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/avr/pgmspace.h \

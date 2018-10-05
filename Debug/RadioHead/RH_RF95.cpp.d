@@ -1,6 +1,6 @@
-C:\Users\hjorv\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\RadioHead\RH_RF95.cpp.o: \
+C:\Users\Arnor\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\RadioHead\RH_RF95.cpp.o: \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead\RH_RF95.cpp \
- C:\Users\hjorv\OneDrive\Documents\GitHub\MECH_LAB3/RH_RF95.h \
+ C:\Users\Arnor\Documents\GitHub\MECH_LAB3/RH_RF95.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RHSPIDriver.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RHGenericDriver.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RadioHead.h \
