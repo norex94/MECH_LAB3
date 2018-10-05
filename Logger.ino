@@ -124,6 +124,7 @@ void readGPS() {
 	
 }
 
+//Þetta fall er á þræði og er kallað sífelt á það. 
 void updateWheater() {
 	
 	while(1){
@@ -136,7 +137,6 @@ void updateWheater() {
 		
 		tempC = baro.getTemperature();
 		
-
 		threads.yield();
 	}
 }
@@ -203,6 +203,10 @@ bool logToSDCard(const char *name) {
 
 void printToSerial() {
 	
+	Serial.print("Alt:"); Serial.print(altm); Serial.println(" meters");
+	Serial.print("Temp:"); Serial.print(tempC); Serial.println("*C");
+	Serial.print("Pressure:"); Serial.print(pascals / 1000); Serial.println(" mBar");
+
 	Serial.print("\nTime: ");
 	Serial.print(GPS.hour, DEC); Serial.print(':');
 	Serial.print(GPS.minute, DEC); Serial.print(':');
@@ -231,23 +235,16 @@ void printToSerial() {
 void loop()
 {
 	
-	readGPS();
+	readGPS(); //GPS er ekki á þræði því það kom einvher bugg
 	// if millis() or timer wraps around, we'll just reset it
 	if (timer > millis()) timer = millis();
 
 	// approximately every 2 seconds or so, print out the current stats
 	if (millis() - timer > 1000) {
 		timer = millis(); // reset the timer
-		Serial.print(altm); Serial.print(" meters#  ");
-		Serial.print(tempC); Serial.println("*C#");
-		Serial.print(pascals / 1000); Serial.print(" mBar#  ");
-		Serial.println();
 
-		
-//		updateWheater();
-		logToSDCard("GPS.txt");
 		printToSerial();
-
+		logToSDCard("GPS.txt");
 
 
 		Serial.println("_________________________________");
