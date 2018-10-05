@@ -31,7 +31,7 @@ float tempC;
 
 
 //fyrir radio
-//RH_RF95 rf95(10.24);
+RH_RF95 rf95(10.24);
 
 
 //fyrir SD kort
@@ -91,11 +91,11 @@ void setup()
 
 	
 	//RADIO ___________________________________________________________
-	/*if (!rf95.init()) {
+	if (!rf95.init()) {
 		Serial.println("init failed");
 	}
 	else { Serial.println("RF95 Success"); }
-	*/
+	
 
 	Serial.println("Done setup");
 	// Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
@@ -231,6 +231,95 @@ void printToSerial() {
 
 
 }
+
+//Mission Control caller ID
+const uint8_t MC_ID = 9;
+
+//Flight Computer caller ID
+const uint8_t FC_ID = 8;
+
+//two types of commands: set state & set throttle
+uint8_t CMD_SET_STATE = 0x01; // B 0000 0001;
+uint8_t CMD_SET_THROTTLE = 0x02; // B 0000 0010;
+
+//the command I will be sending: nr.1-command type, nr.2-value and nr.3-error check.
+const int COMMAND_size = 3;
+uint8_t COMMAND[COMMAND_size];
+uint8_t CMD_TYPE;
+uint8_t CMD_VALUE;
+uint8_t CMD_CHECK;
+//the data I will be recieving from the Flight Computer
+uint8_t DATA_TYPE;
+uint8_t DATA_VALUE;
+uint8_t DATA_ERROR;
+
+void recieveDATA()
+{
+	uint8_t buf[COMMAND_size];
+	uint8_t len = sizeof(buf);
+
+	//Serial.println("Waiting for reply...");
+	//MAX wait for DATA is set 1 sec.
+	if (rf95.waitAvailableTimeout(100))
+	{
+		if (rf95.recv(buf, &len))
+		{
+			if (rf95.headerId() == FC_ID) {
+				if (buf[2] == (buf[0] ^ buf[1]))
+				{
+					DATA_TYPE = buf[0];
+					DATA_VALUE = buf[1];
+					DATA_ERROR = buf[2];
+
+					switch (DATA_TYPE)
+					{
+					case 0x01:
+						Serial.print("#ACK COMMAND: ");
+						Serial.println(buf[1]);
+						break;
+
+					case 0x02:
+						Serial.print("#BATT VOLTAGE: ");
+						Serial.println(buf[1]);
+						break;
+					case 0x03:
+						Serial.println("#Command FAIL");
+						break;
+					default:
+						Serial.println("#FAILED");
+						break;
+					}
+				}
+				else
+				{
+					Serial.println("CheackSum ERROR");
+					
+
+				}
+				//Serial.println((char*)buf);
+				//Serial.print("RSSI: ");
+				//Serial.println(rf95.lastRssi(), DEC);
+			}
+			else {
+				Serial.println("Not my message, ID:");
+				Serial.println(rf95.headerId());
+			}
+
+		}
+		else
+		{
+			Serial.println("Receive failed");
+			
+		}
+	}
+	else
+	{
+		Serial.println("ACK not received");
+		
+	}
+
+}
+
 
 void loop()
 {

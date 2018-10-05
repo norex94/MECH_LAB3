@@ -1,10 +1,10 @@
 C:\Users\Arnor\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\RadioHead\RH_RF95.cpp.o: \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead\RH_RF95.cpp \
- C:\Users\Arnor\Documents\GitHub\MECH_LAB3/RH_RF95.h \
+ C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RH_RF95.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RHSPIDriver.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RHGenericDriver.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RadioHead.h \
- C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/Arduino.h \
+ C:\Users\Arnor\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug/pch/Arduino.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/WProgram.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/avr/pgmspace.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/avr/interrupt.h \
@@ -41,6 +41,7 @@ C:\Users\Arnor\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\RadioHead\RH_RF
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/elapsedMillis.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/Arduino.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/IntervalTimer.h \
+ C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/pins_arduino.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\SPI/SPI.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/DMAChannel.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/EventResponder.h \
