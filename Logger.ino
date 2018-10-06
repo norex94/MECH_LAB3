@@ -55,7 +55,7 @@ float tempC;
 
 
 //fyrir radio
-RH_RF95 rf95(10.24);
+RH_RF95 rf95(10,24);
 
 
 //fyrir SD kort
@@ -276,7 +276,7 @@ void sendMessage()
 	MESSAGE[1] = CMD_VALUE;
 	MESSAGE[2] = CMD_CHECK;
 
-	threads.delay(1000);
+	
 	rf95.setHeaderId(MC_ID);
 	Serial.print("Transmitting ");
 	//Serial.println(MC_ID);

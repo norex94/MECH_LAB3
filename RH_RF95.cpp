@@ -78,7 +78,7 @@ bool RH_RF95::init()
     }
     _deviceForInterrupt[_myInterruptIndex] = this;
     if (_myInterruptIndex == 0)
-	attachInterrupt(interruptNumber, isr0, RISING);
+	attachInterrupt(interruptNumber, isr0, HIGH);
     else if (_myInterruptIndex == 1)
 	attachInterrupt(interruptNumber, isr1, RISING);
     else if (_myInterruptIndex == 2)
