@@ -1,6 +1,6 @@
-C:\Users\Arnor\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\Adafruit_GPS-master\Adafruit_GPS.cpp.o: \
- C:\Users\Arnor\Documents\Arduino\libraries\Adafruit_GPS-master\Adafruit_GPS.cpp \
- C:\Users\Arnor\Documents\Arduino\libraries\Adafruit_GPS-master/Adafruit_GPS.h \
+C:\Users\hjorv\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\Adafruit_GPS-master\Adafruit_GPS.cpp.o: \
+ C:\Users\hjorv\OneDrive\Documents\Arduino\libraries\Adafruit_GPS-master\Adafruit_GPS.cpp \
+ C:\Users\hjorv\OneDrive\Documents\Arduino\libraries\Adafruit_GPS-master/Adafruit_GPS.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/Arduino.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/WProgram.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\cores\teensy3/avr/pgmspace.h \

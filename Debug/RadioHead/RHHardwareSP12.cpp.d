@@ -1,4 +1,4 @@
-C:\Users\Arnor\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\RadioHead\RHHardwareSP12.cpp.o: \
+C:\Users\hjorv\AppData\Local\Temp\VMBuilds\Logger\teensy36\Debug\RadioHead\RHHardwareSP12.cpp.o: \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead\RHHardwareSP12.cpp \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RHHardwareSPI2.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\teensy\avr\libraries\RadioHead/RHGenericSPI.h \
