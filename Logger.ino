@@ -1,4 +1,4 @@
-//LAB3
+ï»¿//LAB3
 #include <Wire.h>
 #include <Adafruit_MPL3115A2.h>
 #include <SD.h>
@@ -10,10 +10,10 @@
 
 //LoRA-#####################################################################
 //Mission Control caller ID
-const uint8_t MC_ID = 9;
+const uint8_t MC_ID = 8;
 
 //Flight Computer caller ID
-const uint8_t FC_ID = 8;
+const uint8_t FC_ID = 9;
 
 //two types of commands: set state & set throttle
 uint8_t CMD_SEND_BACK = 0x01; // B 0000 0001;
@@ -51,7 +51,7 @@ uint32_t timer = millis();
 int VALUE;
 float TEMP;
 
-//Fyrir hæðarnema
+//Fyrir hï¿½ï¿½arnema
 Adafruit_MPL3115A2 baro = Adafruit_MPL3115A2();
 //BREYTURR----------------------------------------------
 float pascals;
@@ -60,7 +60,7 @@ float tempC;
 
 
 //fyrir radio
-RH_RF95 rf95(10,24);
+RH_RF95 rf95(10, 24);
 
 
 //fyrir SD kort
@@ -72,10 +72,10 @@ const int chipSelect = BUILTIN_SDCARD;
 
 void setup()
 {
-   Serial.begin(115200);
-	
-   analogReadResolution(12);
-   pinMode(TMP, INPUT);
+	Serial.begin(115200);
+
+	analogReadResolution(12);
+	pinMode(TMP, INPUT);
 
 	pinMode(PIN_A17, OUTPUT);
 
@@ -89,8 +89,8 @@ void setup()
 		return;
 	}
 	Serial.println("card initialized.");
-	//HÆÐARNEMI ___________________________________________________________
-	//Chekka hvort hæðarnemi sé tengdur
+	//Hï¿½ï¿½ARNEMI ___________________________________________________________
+	//Chekka hvort hï¿½ï¿½arnemi sï¿½ tengdur
 	while (!baro.begin()) {
 		Serial.println("Couldnt find Altidude sensor...");
 		delay(100);
@@ -120,20 +120,20 @@ void setup()
 
 	Serial.println("GPS DONE");
 
-	
+
 	//RADIO ___________________________________________________________
 	if (!rf95.init()) {
 		Serial.println("init failed");
 	}
 	else { Serial.println("RF95 Success"); }
-	
+
 
 	Serial.println("Done setup");
 	// Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
 
-	//Þræðir
+	//ï¿½rï¿½ï¿½ir
 	threads.addThread(updateWheater);
-	
+
 
 	Serial.println("Thread set");
 
@@ -141,12 +141,12 @@ void setup()
 }
 
 void readGPS() {
-		
+
 	// read data from the GPS in the 'main loop'
 	GPS.read();
 	// if you want to debug, this is a good time to do it!
 	//if (GPSECHO)
-	//	if (c) Serial.print(c);
+	//  if (c) Serial.print(c);
 	// if a sentence is received, we can check the checksum, parse it...
 	if (GPS.newNMEAreceived()) {
 		// a tricky thing here is if we print the NMEA sentence, or data
@@ -156,36 +156,36 @@ void readGPS() {
 		if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
 			return; // we can fail to parse a sentence in which case we should just wait for another
 	}
-	
-	
-	
+
+
+
 }
 
-//Þetta fall er á þræði og er kallað sífelt á það. 
+//ï¿½etta fall er ï¿½ ï¿½rï¿½ï¿½i og er kallaï¿½ sï¿½felt ï¿½ ï¿½aï¿½. 
 void updateWheater() {
 
-	while(1){
+	while (1) {
 		//Serial.println("----WHEATER UPDATE-----");
 		pascals = baro.getPressure();
 		threads.delay(50);
 
 		altm = baro.getAltitude();
 		threads.delay(50);
-		
+
 		tempC = baro.getTemperature();
-		
+
 		threads.yield();
 	}
 
 }
 
 bool logToSDCard(const char *name) {
-	
+
 	//Serial.println("----LOG UPDATE-----");
 	// open the file. note that only one file can be open at a time,
 	// so you have to close this one before opening another.
 	File dataFile = SD.open(name, FILE_WRITE);
-	   
+
 	// if the file is available, write to it:
 	if (dataFile) {
 
@@ -201,7 +201,7 @@ bool logToSDCard(const char *name) {
 
 		dataFile.print(GPS.latitude, 4); dataFile.print(GPS.lat);
 		dataFile.print(",");
-		
+
 		dataFile.print(GPS.longitude, 4); dataFile.print(GPS.lon);
 		dataFile.print(",");
 
@@ -210,16 +210,16 @@ bool logToSDCard(const char *name) {
 
 		dataFile.print(tempC);
 		dataFile.print(",");
-		
+
 		dataFile.print(altm);
 		dataFile.print(",");
 
 		dataFile.print((int)GPS.fix);
 		dataFile.print(",");
-		
+
 		dataFile.print((int)GPS.fixquality);
 		dataFile.print(",");
-		
+
 		dataFile.print((int)GPS.satellites);
 		dataFile.println(";");
 
@@ -240,7 +240,7 @@ bool logToSDCard(const char *name) {
 }
 
 void printToSerial() {
-	
+
 	Serial.print("Alt:"); Serial.print(altm); Serial.println(" meters");
 	Serial.print("Temp:"); Serial.print(tempC); Serial.println("*C");
 	Serial.print("Pressure:"); Serial.print(pascals / 1000); Serial.println(" mBar");
@@ -272,9 +272,9 @@ void printToSerial() {
 
 void sendMessage()
 {
-	
+
 	CMD_TYPE = 0x01;
-	CMD_VALUE = 0x05;
+	CMD_VALUE = TEMP;
 
 
 	//check is the XOR of TYPE and VALUE
@@ -283,7 +283,7 @@ void sendMessage()
 	MESSAGE[1] = CMD_VALUE;
 	MESSAGE[2] = CMD_CHECK;
 
-	
+
 	rf95.setHeaderId(MC_ID);
 	Serial.print("Transmitting ");
 	//Serial.println(MC_ID);
@@ -295,7 +295,7 @@ void sendMessage()
 	//Serial.print(" Data: ");
 	//Serial.println(CMD_VALUE, DEC);
 
-	
+
 	//recieveDATA();
 
 }
@@ -340,7 +340,7 @@ void recieveDATA()
 				else
 				{
 					Serial.println("CheackSum ERROR");
-					
+
 
 				}
 				//Serial.println((char*)buf);
@@ -356,13 +356,13 @@ void recieveDATA()
 		else
 		{
 			Serial.println("Receive failed");
-			
+
 		}
 	}
 	else
 	{
 		Serial.println("ACK not received");
-		
+
 	}
 
 }
@@ -383,28 +383,27 @@ void readTEMP()
 
 void loop()
 {
-	
-	readGPS(); //GPS er ekki á þræði því það kom einvher bugg
+
+	readGPS(); //GPS er ekki ï¿½ ï¿½rï¿½ï¿½i ï¿½vï¿½ ï¿½aï¿½ kom einvher bugg
 	// if millis() or timer wraps around, we'll just reset it
 	if (timer > millis()) timer = millis();
 
 	// approximately every 2 seconds or so, print out the current stats
 	if (millis() - timer > 1000) {
 		timer = millis(); // reset the timer
-		readTEMP();			// Bæta við að þessi loggast líka á SD-kortið
+		readTEMP();     // Bï¿½ta viï¿½ aï¿½ ï¿½essi loggast lï¿½ka ï¿½ SD-kortiï¿½
 
 		printToSerial();
 		logToSDCard("GPS.txt");
 
-		//sendMessage();
+		sendMessage();
 		Serial.println("_________________________________");
 
 	}
 
-	
+
 
 }
-
 
 
 
