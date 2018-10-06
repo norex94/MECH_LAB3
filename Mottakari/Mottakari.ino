@@ -215,7 +215,7 @@ void recieveDATA()
           switch (DATA_TYPE)
           {
           case 0x01:
-            Serial.print("#ACK COMMAND: ");
+            Serial.print("Tempature: ");
             Serial.println(buf[1]);
             digitalWrite(ERRORLED, LOW);
             break;
@@ -502,5 +502,5 @@ void loop()
   //Serial.println("Current stage:" + (String)CurrentStateNow);
 
   //Serial.println("____________________");
-  delay(100);
+  delay(1000);
 }
