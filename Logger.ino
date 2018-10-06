@@ -7,6 +7,30 @@
 #include <RH_RF95.h>
 #include <TeensyThreads.h>
 
+
+//LoRA-#####################################################################
+//Mission Control caller ID
+const uint8_t MC_ID = 9;
+
+//Flight Computer caller ID
+const uint8_t FC_ID = 8;
+
+//two types of commands: set state & set throttle
+uint8_t CMD_SEND_BACK = 0x01; // B 0000 0001;
+uint8_t CMD_SET_NAME = 0x02; // B 0000 0010;
+
+//the command I will be sending: nr.1-command type, nr.2-value and nr.3-error check.
+const int MESSAGE_SIZE = 3;
+uint8_t MESSAGE[MESSAGE_SIZE];
+uint8_t CMD_TYPE;
+uint8_t CMD_VALUE;
+uint8_t CMD_CHECK;
+//the data I will be recieving from the Flight Computer
+uint8_t DATA_TYPE;
+uint8_t DATA_VALUE;
+uint8_t DATA_ERROR;
+
+
 //GPS-#####################################################################
 // what's the name of the hardware serial port?
 #define GPSSerial Serial5
@@ -100,13 +124,17 @@ void setup()
 	Serial.println("Done setup");
 	// Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
 
+	//Þræðir
 	threads.addThread(updateWheater);
+	
+
 	Serial.println("Thread set");
 
 	digitalWrite(PIN_A17, HIGH);
 }
 
 void readGPS() {
+		
 	// read data from the GPS in the 'main loop'
 	GPS.read();
 	// if you want to debug, this is a good time to do it!
@@ -122,11 +150,13 @@ void readGPS() {
 			return; // we can fail to parse a sentence in which case we should just wait for another
 	}
 	
+	
+	
 }
 
 //Þetta fall er á þræði og er kallað sífelt á það. 
 void updateWheater() {
-	
+
 	while(1){
 		//Serial.println("----WHEATER UPDATE-----");
 		pascals = baro.getPressure();
@@ -139,6 +169,7 @@ void updateWheater() {
 		
 		threads.yield();
 	}
+
 }
 
 bool logToSDCard(const char *name) {
@@ -164,7 +195,7 @@ bool logToSDCard(const char *name) {
 		dataFile.print(GPS.latitude, 4); dataFile.print(GPS.lat);
 		dataFile.print(",");
 		
-		dataFile.print(GPS.longitude, 4); dataFile.println(GPS.lon);
+		dataFile.print(GPS.longitude, 4); dataFile.print(GPS.lon);
 		dataFile.print(",");
 
 		dataFile.print(GPS.altitude);
@@ -232,30 +263,39 @@ void printToSerial() {
 
 }
 
-//Mission Control caller ID
-const uint8_t MC_ID = 9;
+void sendMessage()
+{
+	
+	CMD_TYPE = 0x01;
+	CMD_VALUE = 0x05;
 
-//Flight Computer caller ID
-const uint8_t FC_ID = 8;
 
-//two types of commands: set state & set throttle
-uint8_t CMD_SET_STATE = 0x01; // B 0000 0001;
-uint8_t CMD_SET_THROTTLE = 0x02; // B 0000 0010;
+	//check is the XOR of TYPE and VALUE
+	CMD_CHECK = CMD_TYPE ^ CMD_VALUE;
+	MESSAGE[0] = CMD_TYPE;
+	MESSAGE[1] = CMD_VALUE;
+	MESSAGE[2] = CMD_CHECK;
 
-//the command I will be sending: nr.1-command type, nr.2-value and nr.3-error check.
-const int COMMAND_size = 3;
-uint8_t COMMAND[COMMAND_size];
-uint8_t CMD_TYPE;
-uint8_t CMD_VALUE;
-uint8_t CMD_CHECK;
-//the data I will be recieving from the Flight Computer
-uint8_t DATA_TYPE;
-uint8_t DATA_VALUE;
-uint8_t DATA_ERROR;
+	threads.delay(1000);
+	rf95.setHeaderId(MC_ID);
+	Serial.print("Transmitting ");
+	//Serial.println(MC_ID);
+	rf95.send((uint8_t *)MESSAGE, MESSAGE_SIZE);
+	rf95.waitPacketSent();
+	Serial.println("Done");
+	//Serial.print("#Message Sent");
+	//Serial.print(CMD_TYPE, HEX);
+	//Serial.print(" Data: ");
+	//Serial.println(CMD_VALUE, DEC);
+
+	
+	//recieveDATA();
+
+}
 
 void recieveDATA()
 {
-	uint8_t buf[COMMAND_size];
+	uint8_t buf[MESSAGE_SIZE];
 	uint8_t len = sizeof(buf);
 
 	//Serial.println("Waiting for reply...");
@@ -335,7 +375,7 @@ void loop()
 		printToSerial();
 		logToSDCard("GPS.txt");
 
-
+		//sendMessage();
 		Serial.println("_________________________________");
 
 	}
