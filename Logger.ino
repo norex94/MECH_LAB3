@@ -46,6 +46,11 @@ uint32_t timer = millis();
 
 //hitamaelir er a pinna 14 sem er A0!!!!!!!!!!!!!!
 
+//Fyrir ANALOG hitanema:
+#define TMP 14
+int VALUE;
+float TEMP;
+
 //Fyrir hæðarnema
 Adafruit_MPL3115A2 baro = Adafruit_MPL3115A2();
 //BREYTURR----------------------------------------------
@@ -63,13 +68,15 @@ RH_RF95 rf95(10,24);
  // Teensy 3.5 & 3.6 on-board: BUILTIN_SDCARD
 const int chipSelect = BUILTIN_SDCARD;
 
-
 //---------------------------------------------
 
 void setup()
 {
    Serial.begin(115200);
 	
+   analogReadResolution(12);
+   pinMode(TMP, INPUT);
+
 	pinMode(PIN_A17, OUTPUT);
 
 	//SD KORT ___________________________________________________________
@@ -360,6 +367,19 @@ void recieveDATA()
 
 }
 
+float modifiedMap(float x, float in_min, float in_max, float out_min, float out_max)
+{
+	float temp = (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+	temp = (float)(4 * temp);
+	return (float)temp / 4;
+}
+
+void readTEMP()
+{
+	VALUE = analogRead(TMP);
+	TEMP = modifiedMap(VALUE, 663, 930, 0.00, 25.00);
+}
+
 
 void loop()
 {
@@ -371,6 +391,7 @@ void loop()
 	// approximately every 2 seconds or so, print out the current stats
 	if (millis() - timer > 1000) {
 		timer = millis(); // reset the timer
+		readTEMP();			// Bæta við að þessi loggast líka á SD-kortið
 
 		printToSerial();
 		logToSDCard("GPS.txt");
