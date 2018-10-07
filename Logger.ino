@@ -21,9 +21,9 @@ uint8_t CMD_SET_NAME = 0x02; // B 0000 0010;
 
 //the command I will be sending: nr.1-command type, nr.2-value and nr.3-error check.
 const int MESSAGE_SIZE = 3;
-uint8_t MESSAGE[MESSAGE_SIZE];
+uint16_t MESSAGE[MESSAGE_SIZE];
 uint8_t CMD_TYPE;
-uint8_t CMD_VALUE;
+uint16_t CMD_VALUE;
 uint8_t CMD_CHECK;
 //the data I will be recieving from the Flight Computer
 uint8_t DATA_TYPE;
@@ -46,6 +46,12 @@ uint32_t timer = millis();
 
 //hitamaelir er a pinna 14 sem er A0!!!!!!!!!!!!!!
 
+//Fyrir ANALOG hitanema:
+#define TMP 14
+int VALUE;
+float TEMP;
+uint16_t TEMP_VALUE;
+
 //Fyrir hæðarnema
 Adafruit_MPL3115A2 baro = Adafruit_MPL3115A2();
 //BREYTURR----------------------------------------------
@@ -63,13 +69,15 @@ RH_RF95 rf95(10,24);
  // Teensy 3.5 & 3.6 on-board: BUILTIN_SDCARD
 const int chipSelect = BUILTIN_SDCARD;
 
-
 //---------------------------------------------
 
 void setup()
 {
    Serial.begin(115200);
 	
+   analogReadResolution(12);
+   pinMode(TMP, INPUT);
+
 	pinMode(PIN_A17, OUTPUT);
 
 	//SD KORT ___________________________________________________________
@@ -119,8 +127,6 @@ void setup()
 		Serial.println("init failed");
 	}
 	else { Serial.println("RF95 Success"); }
-
-	rf95.setHeaderId(MC_ID);
 	
 
 	Serial.println("Done setup");
@@ -128,8 +134,7 @@ void setup()
 
 	//Þræðir
 	threads.addThread(updateWheater);
-	threads.addThread(sendMessage);
-
+	
 
 	Serial.println("Thread set");
 
@@ -266,40 +271,34 @@ void printToSerial() {
 
 }
 
-int count = 0;
-
 void sendMessage()
 {
-	while (1) {
+	
+	CMD_TYPE = 0x01;
+	CMD_VALUE = TEMP_VALUE;
+
+
+	//check is the XOR of TYPE and VALUE
+	CMD_CHECK = CMD_TYPE ^ CMD_VALUE;
+	MESSAGE[0] = CMD_TYPE;
+	MESSAGE[1] = CMD_VALUE;
+	MESSAGE[2] = CMD_CHECK;
 
 	
-		CMD_TYPE = 0x01;
-		CMD_VALUE = 0x05;
+	rf95.setHeaderId(MC_ID);
+	Serial.print("Transmitting ");
+	//Serial.println(MC_ID);
+	rf95.send((uint8_t *)MESSAGE, MESSAGE_SIZE);
+	rf95.waitPacketSent();
+	Serial.println("Done");
+	//Serial.print("#Message Sent");
+	//Serial.print(CMD_TYPE, HEX);
+	//Serial.print(" Data: ");
+	//Serial.println(CMD_VALUE, DEC);
 
-
-		//check is the XOR of TYPE and VALUE
-		CMD_CHECK = CMD_TYPE ^ CMD_VALUE;
-		MESSAGE[0] = CMD_TYPE;
-		MESSAGE[1] = CMD_VALUE;
-		MESSAGE[2] = CMD_CHECK;
-		
-		Serial.print("Transmitting ");
-
-		rf95.send((uint8_t *)MESSAGE, MESSAGE_SIZE);
-		threads.delay(50);
-		rf95.waitPacketSent();
-
-		Serial.println("Done");
-		//Serial.print("#Message Sent");
-		//Serial.print(CMD_TYPE, HEX);
-		//Serial.print(" Data: ");
-		//Serial.println(CMD_VALUE, DEC);
-		threads.delay(500);
 	
-		//recieveDATA();
-		count++;
-		threads.yield();
-	}
+	//recieveDATA();
+
 }
 
 void recieveDATA()
@@ -369,6 +368,20 @@ void recieveDATA()
 
 }
 
+float modifiedMap(float x, float in_min, float in_max, float out_min, float out_max)
+{
+	float temp = (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+	temp = (float)(4 * temp);
+	return (float)temp / 4;
+}
+
+void readTEMP()
+{
+	VALUE = analogRead(TMP);
+	TEMP = modifiedMap(VALUE, 663, 930, 0.00, 25.00);
+	TEMP_VALUE = TEMP * 100;
+}
+
 
 void loop()
 {
@@ -380,12 +393,12 @@ void loop()
 	// approximately every 2 seconds or so, print out the current stats
 	if (millis() - timer > 1000) {
 		timer = millis(); // reset the timer
+		readTEMP();			// Bæta við að þessi loggast líka á SD-kortið
 
 		printToSerial();
 		logToSDCard("GPS.txt");
-		delay(100);
+
 		//sendMessage();
-		Serial.println(count);
 		Serial.println("_________________________________");
 
 	}
