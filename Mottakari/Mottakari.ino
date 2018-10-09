@@ -39,8 +39,8 @@ uint8_t CMD_SET_STATE = 0x01; // B 0000 0001;
 uint8_t CMD_SET_THROTTLE = 0x02; // B 0000 0010;
 
 //the command I will be sending: nr.1-command type, nr.2-value and nr.3-error check.
-const int MESSAGE_SIZE = 3;
-uint8_t MESSAGE[MESSAGE_SIZE];
+const int COMMAND_size = 3;
+uint8_t COMMAND[COMMAND_size];
 uint8_t CMD_TYPE;
 uint8_t CMD_VALUE;
 uint8_t CMD_CHECK;

@@ -208,6 +208,9 @@ bool logToSDCard(const char *name) {
     dataFile.print(GPS.altitude);
     dataFile.print(",");
 
+    dataFile.print(TEMP);
+    dataFile.print(",");
+
     dataFile.print(tempC);
     dataFile.print(",");
     
